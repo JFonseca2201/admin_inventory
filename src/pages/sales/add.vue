@@ -485,7 +485,8 @@ const cleanFieldForm = () => {
     description.value = '';
     sale_details.value = [];
     warehouse_id.value = null;
-    client_selected.value = [];
+    car_selected.value=null; 
+    client_selected.value = null;
     search_client.value = '';
     total_all.value = 0;
     ivg_total.value = 0;
@@ -762,32 +763,32 @@ definePage({ meta: { permission: 'register_sale', } });
                     <VCol cols="7">
                         <VRow>
                             <VCol cols="12">                              
-                                    <VAutocomplete
-                                        v-model="select_product"
-                                        v-model:search="search_product"
-                                        :items="items"
-                                        :loading="loading"
-                                        item-title="title"
-                                        item-value="id"
-                                        return-object
-                                        placeholder="Buscar por nombre o código"
-                                        label="¿Qué producto busca?"
-                                        variant="underlined"
-                                        :menu-props="{ maxHeight: '300px' }"
-                                        clearable
-                                        hide-no-data
-                                        hide-details
-                                        no-filter
-                                        @update:search="querySelections"
-                                        >
-                                        <!-- SOLO agregamos el SKU -->
-                                        <template #item="{ props, item }">
-                                            <v-list-item
-                                            v-bind="props"
-                                            :subtitle="`Cod.: ${item.raw.sku}`"
-                                            />
-                                        </template>
-                                    </VAutocomplete>
+                                <VAutocomplete
+                                       v-model="select_product"
+                                       v-model:search="search_product"
+                                       :items="items"
+                                       :loading="loading"
+                                       item-title="title"
+                                       item-value="id"
+                                       return-object
+                                       placeholder="Buscar por nombre o código"
+                                       label="¿Qué producto busca?"
+                                       variant="underlined"
+                                       :menu-props="{ maxHeight: '300px' }"
+                                       clearable
+                                       hide-no-data
+                                       hide-details
+                                       no-filter
+                                       @update:search="querySelections"
+                                       >
+                                       <!-- SOLO agregamos el SKU -->
+                                       <template #item="{ props, item }">
+                                           <v-list-item
+                                           v-bind="props"
+                                           :subtitle="`Cod.: ${item.raw.sku}`"
+                                           />
+                                       </template>
+                                </VAutocomplete>
 
                             </VCol>
                             <VCol cols="12" v-if="warning_warehouse">
