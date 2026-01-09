@@ -47,8 +47,10 @@ const roles = ref([]);
 const searchQuery = ref(null);
 const user_selected_edit = ref(null);
 const user_selected_delete = ref(null);
+const isLoading = ref(false);
 
 const list = async () => {
+  isLoading.value = true;
   try {
     const resp = await $api(
       "users?search=" + (searchQuery.value ? searchQuery.value : ""),
@@ -57,12 +59,14 @@ const list = async () => {
         onResponseError({ response }) {
           console.log(response._data.error);
         },
-      }
+      },
     );
     console.log(resp);
     list_users.value = resp.users;
   } catch (error) {
     console.log(error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -145,6 +149,13 @@ definePage({ meta: { permission: "list_user" } });
 <template>
   <div>
     <VCard title="🧑‍🦱 Usuarios">
+      <VOverlay
+        :model-value="isLoading"
+        class="align-center justify-center"
+        absolute
+      >
+        <VProgressCircular indeterminate size="50" width="5" color="primary" />
+      </VOverlay>
       <VCardText>
         <VRow class="justify-space-between">
           <VCol cols="3">

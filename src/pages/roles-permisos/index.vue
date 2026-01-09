@@ -31,7 +31,10 @@ const searchQuery = ref(null);
 const role_selected_edit = ref(null);
 const role_selected_delete = ref(null);
 
+const isLoading = ref(false);
+
 const list = async () => {
+  isLoading.value = true;
   try {
     const resp = await $api(
       "role?search=" + (searchQuery.value ? searchQuery.value : ""),
@@ -40,12 +43,14 @@ const list = async () => {
         onResponseError({ response }) {
           console.log(response._data.error);
         },
-      }
+      },
     );
     console.log(resp);
     list_roles.value = resp.roles;
   } catch (error) {
     console.log(error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -103,6 +108,13 @@ definePage({ meta: { permission: "list_role" } });
 <template>
   <div>
     <VCard title="🔏 Roles y Permisos">
+      <VOverlay
+        :model-value="isLoading"
+        class="align-center justify-center"
+        absolute
+      >
+        <VProgressCircular indeterminate size="50" width="5" color="primary" />
+      </VOverlay>
       <VCardText>
         <VRow class="justify-space-between">
           <VCol cols="3">

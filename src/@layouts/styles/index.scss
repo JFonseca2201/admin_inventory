@@ -1,3 +1,33 @@
 @use "global";
 @use "vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.min.css";
 @use "classes";
+/* Toast rojo SweetAlert2 transparente y fijo */
+.swal2-toast.swal2-show.swal2-toast-red {
+  background-color: rgba(
+    229,
+    57,
+    53,
+    0.85
+  ) !important; /* rojo con transparencia */
+  color: #fff !important; /* texto blanco */
+  transform: none !important; /* quita cualquier movimiento de animación */
+  margin: 1rem !important; /* opcional: margen fijo */
+}
+/* Toast verde transparente y fijo para success */
+/* Toast verde más transparente y fijo para success */
+.swal2-toast.swal2-show.swal2-toast-success {
+  background-color: rgba(56, 142, 60, 0.65) !important; /* más transparente */
+  color: #fff !important;
+  transform: none !important; /* quita cualquier animación */
+  margin: 1rem !important;
+  pointer-events: auto; /* para que no desaparezca al pasar el mouse */
+}
+
+/* Mantener posición fija */
+.swal2-toast.swal2-top-end {
+  top: 1rem !important;
+  right: 1rem !important;
+}
+.swal2-no-animation {
+  animation: none !important;
+}

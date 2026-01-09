@@ -70,6 +70,7 @@ declare module 'vue' {
     EditPurchaseDetailDialog: typeof import('./src/components/inventory/purchase/EditPurchaseDetailDialog.vue')['default']
     EnableOneTimePasswordDialog: typeof import('./src/components/dialogs/EnableOneTimePasswordDialog.vue')['default']
     ErrorHeader: typeof import('./src/components/ErrorHeader.vue')['default']
+    GlobalLoader: typeof import('./src/components/GlobalLoader.vue')['default']
     I18n: typeof import('./src/@core/components/I18n.vue')['default']
     ImportExcelProduct: typeof import('./src/components/inventory/product/ImportExcelProduct.vue')['default']
     LogisticsShipmentStatistics: typeof import('./src/components/inventory/dashboard/LogisticsShipmentStatistics.vue')['default']

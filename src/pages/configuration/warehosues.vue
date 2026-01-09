@@ -39,7 +39,10 @@ const searchQuery = ref(null);
 const warehouse_selected_edit = ref(null);
 const warehouse_selected_delete = ref(null);
 
+const isLoading = ref(false);
+
 const list = async () => {
+  isLoading.value = true;
   try {
     const resp = await $api(
       "warehouses?search=" + (searchQuery.value ? searchQuery.value : ""),
@@ -48,13 +51,15 @@ const list = async () => {
         onResponseError({ response }) {
           console.log(response._data.error);
         },
-      }
+      },
     );
     console.log(resp);
     list_warehouses.value = resp.warehouses;
     list_sucursales.value = resp.sucursales;
   } catch (error) {
     console.log(error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -113,6 +118,13 @@ definePage({ meta: { permission: "settings" } });
 <template>
   <div>
     <VCard title="🏬 Almacenes">
+      <VOverlay
+        :model-value="isLoading"
+        class="align-center justify-center"
+        absolute
+      >
+        <VProgressCircular indeterminate size="50" width="5" color="primary" />
+      </VOverlay>
       <VCardText>
         <VRow class="justify-space-between">
           <VCol cols="3">
@@ -183,4 +195,5 @@ definePage({ meta: { permission: "settings" } });
       @deleteWarehouse="addDeleteWarehouse"
     ></WarehouseDeleteDialog>
   </div>
-</template>-
+</template>
+-

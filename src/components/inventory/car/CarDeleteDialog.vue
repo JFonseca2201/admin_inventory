@@ -1,106 +1,126 @@
 <script setup>
+import { getCurrentInstance, ref, onMounted } from "vue";
+
 const props = defineProps({
-    isDialogVisible: {
-        type: Boolean,
-        required: true,
-    },
-    carSelected: {
-        type: Object,
-        required: true,
-    },
+  isDialogVisible: {
+    type: Boolean,
+    required: true,
+  },
+  carSelected: {
+    type: Object,
+    required: true,
+  },
 });
 
+const isDeleting = ref(false);
+const isLoading = ref(false);
+const { proxy } = getCurrentInstance();
 const emit = defineEmits(["update:isDialogVisible", "deleteCar"]);
-const warning = ref(null);
-const error_exits = ref(null);
-const success = ref(null);
 
 const deleteCar = async () => {
-    warning.value = null;
-    error_exits.value = null;
-    success.value = null;
-    try {
-        const resp = await $api("cars/" + props.carSelected.id, {
-            method: "DELETE",
-            onResponseError({ response }) {
-                error_exits.value = response._data.error;
-            },
-        });
-        console.log(resp);
-        emit("deleteCar", props.carSelected);
-        onFormReset();
-    } catch (error) {
-        console.log(error);
-    }
+  try {
+    isDeleting.value = true;
+    isLoading.value = true;
+
+    // Llamada API para eliminar
+    await $api(`cars/${props.carSelected.id}`, {
+      method: "DELETE",
+    });
+
+    // Emitir evento para actualizar lista
+    emit("deleteCar", props.carSelected);
+
+    // Usar $toast global
+    proxy.$toast.fire({
+      icon: "error", // rojo
+      title: `El vehículo ${props.carSelected.placa} fue eliminado correctamente`,
+      background: "rgba(211, 47, 47, 0.85)", // rojo con transparencia
+      color: "#fff",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+
+    onFormReset();
+  } catch (error) {
+    proxy.$toast.fire({
+      icon: "error",
+      title: "Error",
+      text: "No se pudo eliminar el vehículo",
+      background: "rgba(211, 47, 47, 0.85)",
+      color: "#fff",
+    });
+  } finally {
+    isDeleting.value = false;
+    isLoading.value = false;
+  }
 };
 
 onMounted(() => {
-    console.log(props.carSelected);
+  console.log(props.carSelected);
 });
 
-const onFormSubmit = () => {
-    emit("update:isDialogVisible", false);
-    emit("submit", userData.value);
-};
-
 const onFormReset = () => {
-    emit("update:isDialogVisible", false);
+  emit("update:isDialogVisible", false);
 };
 
 const dialogVisibleUpdate = (val) => {
-    emit("update:isDialogVisible", val);
+  emit("update:isDialogVisible", val);
 };
 </script>
 
 <template>
-    <VDialog max-width="650" :model-value="props.isDialogVisible" @update:model-value="dialogVisibleUpdate">
-        <VCard class="pa-sm-11 pa-3">
-            <!-- 👉 dialog close btn -->
-            <DialogCloseBtn variant="text" size="default" @click="onFormReset" />
+  <VDialog
+    max-width="650"
+    :model-value="props.isDialogVisible"
+    @update:model-value="dialogVisibleUpdate"
+  >
+    <VCard class="pa-sm-11 pa-3">
+      <!-- Overlay local -->
+      <VOverlay
+        :model-value="isLoading"
+        contained
+        class="align-center justify-center"
+      >
+        <VProgressCircular indeterminate size="50" width="5" color="primary" />
+      </VOverlay>
 
-            <VCardText class="pt-5">
-                <div class="text-center pb-6">
-                    <h4 class="text-h4 mb-2">
-                        Delete Car
-                    </h4>
-                </div>
+      <!-- 👉 dialog close btn -->
+      <DialogCloseBtn variant="text" size="default" @click="onFormReset" />
 
-                <!-- 👉 Form -->
-                <VForm class="mt-4" @submit.prevent="deleteCar">
-                    <VRow>
-                        <!-- 👉 First Name -->
-                        <VCol cols="12">
-                            <p>
-                                ¿Estas seguro de eliminar el vehículo :
-                                {{ props.carSelected.placa }}?
-                            </p>
-                        </VCol>
-                        <VCol cols="12" v-if="warning">
-                            <VAlert closable close-label="Close Alert" color="warning">
-                                {{ warning }}
-                            </VAlert>
-                        </VCol>
-                        <VCol cols="12" v-if="error_exits">
-                            <VAlert closable close-label="Close Alert" color="error">
-                                {{ error_exits }}
-                            </VAlert>
-                        </VCol>
-                        <VCol cols="12" v-if="success">
-                            <VAlert closable close-label="Close Alert" color="success">
-                                {{ success }}
-                            </VAlert>
-                        </VCol>
-                        <!-- 👉 Submit and Cancel -->
-                        <VCol cols="12" class="d-flex flex-wrap justify-center gap-4">
-                            <VBtn type="submit" color="error"> Eliminar </VBtn>
+      <VCardText class="pt-5">
+        <div class="text-center pb-6">
+          <h4 class="text-h4 mb-2">Delete Car</h4>
+        </div>
 
-                            <VBtn color="secondary" variant="outlined" @click="onFormReset">
-                                Cancelar
-                            </VBtn>
-                        </VCol>
-                    </VRow>
-                </VForm>
-            </VCardText>
-        </VCard>
-    </VDialog>
+        <!-- Formulario -->
+        <VForm class="mt-4" @submit.prevent="deleteCar">
+          <VRow>
+            <VCol cols="12">
+              <p>
+                ¿Estas seguro de eliminar el vehículo:
+                {{ props.carSelected.placa }}?
+              </p>
+            </VCol>
+
+            <VCol cols="12" class="d-flex flex-wrap justify-center gap-4">
+              <VBtn
+                type="submit"
+                color="error"
+                :loading="isDeleting"
+                :disabled="isDeleting"
+              >
+                <template v-if="isDeleting"> Eliminando... </template>
+                <template v-else> Eliminar </template>
+              </VBtn>
+
+              <VBtn color="secondary" variant="outlined" @click="onFormReset">
+                Cancelar
+              </VBtn>
+            </VCol>
+          </VRow>
+        </VForm>
+      </VCardText>
+    </VCard>
+  </VDialog>
 </template>
