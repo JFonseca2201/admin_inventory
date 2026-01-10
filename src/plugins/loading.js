@@ -1,27 +1,45 @@
-import { reactive, h } from 'vue'
-import GlobalLoader from '@/components/GlobalLoader.vue'
+import { reactive, h } from "vue";
+import { VOverlay, VProgressCircular } from "vuetify/components";
 
 export default function (app) {
   const state = reactive({
     visible: false,
-  })
+  });
 
   const loading = {
     show() {
-      state.visible = true
+      state.visible = true;
     },
     hide() {
-      state.visible = false
+      state.visible = false;
     },
-  }
+  };
 
-  // 🔥 Disponible en todo: proxy.$loading
-  app.config.globalProperties.$loading = loading
+  // 👉 Agrega helpers globales
+  app.config.globalProperties.$loading = loading;
 
-  // 🔥 Componente global
-  app.component('GlobalLoaderWrapper', {
+  // 👉 Componente global del loader
+  app.component("GlobalLoaderWrapper", {
     setup() {
-      return () => (state.visible ? h(GlobalLoader) : null)
+      return () =>
+        h(
+          VOverlay,
+          {
+            modelValue: state.visible,
+            persistent: true,
+            opacity: 0.4,
+            class: "d-flex align-center justify-center",
+          },
+          {
+            default: () =>
+              h(VProgressCircular, {
+                indeterminate: true,
+                size: 70,
+                width: 6,
+                color: "primary",
+              }),
+          },
+        );
     },
-  })
+  });
 }
