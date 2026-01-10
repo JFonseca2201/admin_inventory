@@ -189,6 +189,7 @@ const getNameUnit = (movimient_for_unit, units) => {
 
 onMounted(() => {
   kardex();
+
   config();
 });
 
