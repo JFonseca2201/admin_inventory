@@ -666,7 +666,15 @@ const store = async () => {
   }
 };
  */
+const increaseQuantity = () => {
+  quantity.value++;
+};
 
+const decreaseQuantity = () => {
+  if (quantity.value > 0) {
+    quantity.value--;
+  }
+};
 onMounted(() => {
   config();
 });
@@ -826,7 +834,7 @@ definePage({ meta: { permission: "register_sale" } });
     </VCard>
 
     <!-- 3. PRODUCTO -->
-    <VCard class="mb-6">
+    <!-- <VCard class="mb-6">
       <VCardText>
         <VRow>
           <VCol cols="7">
@@ -850,7 +858,7 @@ definePage({ meta: { permission: "register_sale" } });
                   no-filter
                   @update:search="querySelections"
                 >
-                  <!-- SOLO agregamos el SKU -->
+                  
                   <template #item="{ props, item }">
                     <v-list-item
                       v-bind="props"
@@ -935,7 +943,161 @@ definePage({ meta: { permission: "register_sale" } });
           </VCol>
         </VRow>
       </VCardText>
+    </VCard> -->
+
+    <VCard class="mb-6">
+      <VCardText>
+        <VRow>
+          <!-- ============================ -->
+          <!--   COLUMNA IZQUIERDA (BUSCAR) -->
+          <!-- ============================ -->
+          <VCol cols="6">
+            <VRow>
+              <!-- Autocomplete de productos -->
+              <VCol cols="12">
+                <VAutocomplete
+                  v-model="select_product"
+                  v-model:search="search_product"
+                  :items="items"
+                  :loading="loading"
+                  item-title="title"
+                  item-value="id"
+                  return-object
+                  placeholder="Buscar por nombre o código"
+                  label="¿Qué producto busca?"
+                  variant="underlined"
+                  :menu-props="{ maxHeight: '300px' }"
+                  clearable
+                  hide-no-data
+                  hide-details
+                  no-filter
+                  @update:search="querySelections"
+                >
+                  <!-- SOLO agregamos el SKU -->
+                  <template #item="{ props, item }">
+                    <v-list-item
+                      v-bind="props"
+                      :subtitle="`Cod.: ${item.raw.sku}`"
+                    />
+                  </template>
+                </VAutocomplete>
+              </VCol>
+
+              <!-- Alertas -->
+              <VCol cols="12" v-if="warning_warehouse">
+                <VAlert closable color="warning">
+                  {{ warning_warehouse }}
+                </VAlert>
+              </VCol>
+
+              <VCol cols="12" v-if="warning_client_product">
+                <VAlert closable color="warning">
+                  {{ warning_client_product }}
+                </VAlert>
+              </VCol>
+            </VRow>
+          </VCol>
+
+          <!-- ============================ -->
+          <!--   COLUMNA DERECHA (DATOS)    -->
+          <!-- ============================ -->
+          <VCol cols="6">
+            <VRow>
+              <!-- Contenedor principal de inputs -->
+              <VCol cols="10">
+                <VRow>
+                  <!-- Unidades -->
+                  <VCol cols="4">
+                    <VSelect
+                      :items="units"
+                      item-title="name"
+                      item-value="id"
+                      placeholder="Select"
+                      v-model="unit_id"
+                      label="Unidades"
+                    />
+                  </VCol>
+
+                  <!-- Precio -->
+                  <VCol cols="4">
+                    <VTextField
+                      v-model="price_unit"
+                      label="Precio"
+                      prefix="$"
+                      type="number"
+                      :disabled="is_gift == 2 ? true : null"
+                    />
+                  </VCol>
+
+                  <!-- Cantidad con botones + y - -->
+                  <VCol cols="4">
+                    <div class="d-flex align-center">
+                      <v-btn
+                        color="primary"
+                        icon
+                        size="small"
+                        @click="decreaseQuantity"
+                      >
+                        -
+                      </v-btn>
+
+                      <VTextField
+                        label="Cantidad"
+                        v-model="quantity"
+                        type="number"
+                        readonly
+                        class="mx-2"
+                        density="compact"
+                      />
+
+                      <v-btn
+                        color="primary"
+                        icon
+                        size="small"
+                        @click="increaseQuantity"
+                      >
+                        +
+                      </v-btn>
+                    </div>
+                  </VCol>
+
+                  <!-- Regalo -->
+                  <VCol
+                    cols="4"
+                    v-if="select_product && select_product.is_gift == 2"
+                  >
+                    <p class="my-0">¿Regalo?</p>
+                    <VCheckbox label="SI" value="2" v-model="is_gift" />
+                  </VCol>
+
+                  <!-- Descuento -->
+                  <VCol
+                    cols="4"
+                    v-if="select_product && select_product.is_discount == 2"
+                  >
+                    <VTextField
+                      label="Descuento"
+                      type="number"
+                      v-model="discount"
+                      prefix="$"
+                      :disabled="is_gift == 2 ? true : null"
+                    />
+                  </VCol>
+                </VRow>
+              </VCol>
+
+              <!-- Botón agregar producto -->
+              <VCol cols="2" class="d-flex align-center">
+                <VBtn color="primary" @click="addProduct()">
+                  <VIcon icon="ri-add-circle-line" />
+                </VBtn>
+              </VCol>
+            </VRow>
+          </VCol>
+        </VRow>
+      </VCardText>
     </VCard>
+
     <!-- 4. DETALLADO DE LA VENTA O COTIZACIÓN -->
 
     <VCard class="mb-6">
