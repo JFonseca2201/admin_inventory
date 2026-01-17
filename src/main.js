@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import App from "@/App.vue";
 import { registerPlugins } from "@core/utils/plugins";
 import Swal from "sweetalert2";
+import directives from "./directives/directives.js";
 
 // Styles
 import "@core/scss/template/index.scss";
@@ -22,5 +23,10 @@ app.config.globalProperties.$toast = Swal.mixin({
 });
 
 registerPlugins(app);
+
+// Registrar TODAS las directivas del archivo
+Object.keys(directives).forEach((name) => {
+  app.directive(name, directives[name]);
+});
 
 app.mount("#app");

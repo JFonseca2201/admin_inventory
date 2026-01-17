@@ -2,6 +2,8 @@
 const router = useRouter();
 const isProductDeleteDialogVisible = ref(false);
 const isImportExcelProductDialogVisible = ref(false);
+const isProductShowDialogVisible = ref(false);
+const product_selected_show = ref(null);
 const currentPage = ref(1);
 const totalPage = ref(0);
 
@@ -20,7 +22,7 @@ const is_gift = ref(null);
 const product_selected_delete = ref(null);
 
 const isLoading = ref(null);
-
+const isSearching = ref(false);
 const list = async () => {
   isLoading.value = true;
   try {
@@ -43,16 +45,25 @@ const list = async () => {
     console.log(resp);
     list_products.value = resp.products.data;
     totalPage.value = resp.total_page;
+    if (currentPage.value > totalPage.value && totalPage.value > 0) {
+      currentPage.value = 1;
+    }
   } catch (error) {
     console.log(error);
   } finally {
     isLoading.value = false;
+    isSearching.value = false;
   }
 };
 
-watch(currentPage, (val) => {
+/* watch(currentPage, (val) => {
   console.log(val);
   list();
+}); */
+watch(currentPage, () => {
+  if (!isSearching.value) {
+    list();
+  }
 });
 
 const reset = () => {
@@ -130,6 +141,10 @@ const addDeleteProduct = (Product) => {
     list_products.value = backup;
   }, 50);
 };
+const showItem = (item) => {
+  product_selected_show.value = item;
+  isProductShowDialogVisible.value = true;
+};
 
 const editItem = (product) => {
   console.log(product);
@@ -152,6 +167,16 @@ const avatarText = (value) => {
   return nameArray.map((word) => word.charAt(0).toUpperCase()).join("");
 };
 
+function formatDateYMD(dateString) {
+  const date = new Date(Date.parse(dateString));
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 onMounted(() => {
   list();
   config();
@@ -159,6 +184,7 @@ onMounted(() => {
 
 definePage({ meta: { permission: "list_product" } });
 </script>
+
 <template>
   <div>
     <VCard title="🛞 Productos">
@@ -263,7 +289,7 @@ definePage({ meta: { permission: "list_product" } });
                 >
                 </VSelect>
               </VCol>
-              <VCol cols="4" md="4">
+              <VCol cols="4" md="4" class="justify-end, nowrap d-flex">
                 <VBtn
                   color="info"
                   class="mx-1"
@@ -274,6 +300,7 @@ definePage({ meta: { permission: "list_product" } });
                     >Buscar productos</VTooltip
                   >
                 </VBtn>
+
                 <VBtn
                   color="secondary"
                   class="mx-1"
@@ -318,62 +345,84 @@ definePage({ meta: { permission: "list_product" } });
           </VCol>
         </VRow>
       </VCardText>
+      <template v-if="list_products.length == 0">
+        <VCardText class="text-center text-body-large">
+          No se encontraron productos.
+        </VCardText>
+      </template>
 
-      <VTable>
-        <thead>
-          <tr>
-            <th class="text-uppercase">Producto</th>
-            <th class="text-uppercase">sku</th>
-            <th class="text-uppercase">Categoría</th>
-            <th class="text-uppercase">¿Regalo?</th>
-            <th class="text-uppercase">¿Descuento?</th>
-            <th class="text-uppercase">IVA(%)</th>
-            <th class="text-uppercase">Garantía</th>
-            <th class="text-uppercase">Estado</th>
+      <template v-else>
+        <VTable>
+          <thead>
+            <tr>
+              <th class="text-uppercase">Producto</th>
+              <th class="text-uppercase">Código</th>
+              <th class="text-uppercase">Categoría</th>
+              <!-- <th class="text-uppercase">¿Regalo?</th>
+            <th class="text-uppercase">¿Descuento?</th> -->
+              <!-- <th class="text-uppercase">IVA(%)</th> -->
+              <th class="text-uppercase">Garantía</th>
+              <th class="text-uppercase">Estado</th>
+              <th class="text-uppercase">Registro</th>
+              <th class="text-uppercase">Acción</th>
+            </tr>
+          </thead>
 
-            <th class="text-uppercase">Registro</th>
-            <th class="text-uppercase">Acción</th>
-          </tr>
-        </thead>
-
-        <tbody class="text-uppercase">
-          <tr v-for="item in list_products" :key="item.id">
-            <td>
-              <div class="d-flex align-center">
-                <VAvatar
-                  size="32"
-                  :color="item.imagen ? '' : 'primary'"
-                  :class="item.imagen ? '' : 'v-avatar-light-bg primary--text'"
-                  :variant="!item.imagen ? 'tonal' : undefined"
-                >
-                  <VImg v-if="item.imagen" :src="item.imagen" />
-                  <span v-else class="text-sm">{{
-                    avatarText(item.title)
-                  }}</span>
-                </VAvatar>
-                <div class="d-flex flex-column ms-3">
-                  {{ item.title }}
+          <tbody class="text-uppercase">
+            <tr v-for="item in list_products" :key="item.id">
+              <td>
+                <div class="d-flex align-center">
+                  <VAvatar
+                    size="32"
+                    :color="item.imagen ? '' : 'primary'"
+                    :class="
+                      item.imagen ? '' : 'v-avatar-light-bg primary--text'
+                    "
+                    :variant="!item.imagen ? 'tonal' : undefined"
+                  >
+                    <VImg v-if="item.imagen" :src="item.imagen" />
+                    <span v-else class="text-sm">{{
+                      avatarText(item.title)
+                    }}</span>
+                  </VAvatar>
+                  <div class="d-flex flex-column ms-3">
+                    {{ item.title }}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <VChip color="primary" v-if="item.state_stock == 1">
-                  Disponible
-                </VChip>
-                <VChip color="warning" v-if="item.state_stock == 2">
-                  Por agotar
-                </VChip>
-                <VChip color="error" v-if="item.state_stock == 3">
-                  Agotado
-                </VChip>
-              </div>
-            </td>
-            <td>
-              {{ item.sku }}
-            </td>
-            <td>
-              {{ item.product_categorie.name }}
-            </td>
-            <td>
+                <div>
+                  <VChip
+                    color="primary"
+                    size="x-small"
+                    variant="tonal"
+                    v-if="item.state_stock == 1"
+                  >
+                    Disponible
+                  </VChip>
+                  <VChip
+                    color="warning"
+                    size="x-small"
+                    variant="tonal"
+                    v-if="item.state_stock == 2"
+                  >
+                    Por agotar
+                  </VChip>
+                  <VChip
+                    color="error"
+                    size="x-small"
+                    variant="tonal"
+                    v-if="item.state_stock == 3"
+                  >
+                    Agotado
+                  </VChip>
+                </div>
+              </td>
+              <td>
+                {{ item.sku }}
+              </td>
+              <td>
+                {{ item.product_categorie.name }}
+              </td>
+              <!-- <td>
               {{ item.is_gift == 1 ? "NO" : "SI" }}
             </td>
             <td>
@@ -382,31 +431,39 @@ definePage({ meta: { permission: "list_product" } });
               <span v-if="item.is_discount == 2"
                 >( {{ item.max_discount }} %)</span
               >
-            </td>
-            <td>{{ item.importe_iva }} %</td>
-            <td>{{ item.warranty_day }} días.</td>
-            <td>
-              <VChip color="primary" v-if="item.state == 1"> Activo </VChip>
-              <VChip color="error" v-if="item.state == 2"> Inactivo </VChip>
-            </td>
+            </td> -->
+              <!-- <td>{{ item.importe_iva }} %</td> -->
+              <td>{{ item.warranty_day }} días.</td>
+              <td>
+                <VChip color="primary" v-if="item.state == 1"> Activo </VChip>
+                <VChip color="error" v-if="item.state == 2"> Inactivo </VChip>
+              </td>
 
-            <td>
-              {{ item.created_at }}
-            </td>
-            <td>
-              <div class="d-flex gap-1">
-                <IconBtn size="small" @click="editItem(item)">
-                  <VIcon icon="ri-pencil-line" />
-                </IconBtn>
-                <IconBtn size="small" @click="deleteItem(item)">
-                  <VIcon icon="ri-delete-bin-line" />
-                </IconBtn>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </VTable>
-      <VPagination v-model="currentPage" :length="totalPage" rounded="circle" />
+              <td style="white-space: nowrap">
+                {{ formatDateYMD(item.created_at) }}
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <IconBtn size="small" @click="showItem(item)">
+                    <VIcon icon="ri-eye-line" />
+                  </IconBtn>
+                  <IconBtn size="small" @click="editItem(item)">
+                    <VIcon icon="ri-pencil-line" />
+                  </IconBtn>
+                  <IconBtn size="small" @click="deleteItem(item)">
+                    <VIcon icon="ri-delete-bin-line" />
+                  </IconBtn>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </VTable>
+        <VPagination
+          v-model="currentPage"
+          :length="totalPage"
+          rounded="circle"
+        />
+      </template>
     </VCard>
 
     <ImportExcelProduct
@@ -421,5 +478,11 @@ definePage({ meta: { permission: "list_product" } });
       :productSelected="product_selected_delete"
       @deleteUser="addDeleteProduct"
     ></ProductDeleteDialog>
+
+    <ProductShow
+      v-if="product_selected_show && isProductShowDialogVisible"
+      v-model:isDialogVisible="isProductShowDialogVisible"
+      :productSelected="product_selected_show"
+    ></ProductShow>
   </div>
 </template>

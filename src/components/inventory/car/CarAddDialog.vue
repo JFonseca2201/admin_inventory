@@ -1,5 +1,7 @@
 <script setup>
 import { getCurrentInstance, ref } from "vue";
+import { validatePlate, formatPlate } from "@/directives/validators";
+
 const { proxy } = getCurrentInstance();
 
 const props = defineProps({
@@ -41,6 +43,16 @@ const store = async () => {
   }
   if (!placa.value) {
     warning.value = "Se debe llenar la placa del vehículo.";
+    return;
+  }
+
+  console.log("PLACA: TRUE/FALSE");
+  console.log(validatePlate(placa.value));
+
+  if (!validatePlate(placa.value)) {
+    setTimeout(() => {
+      warning.value = "Ingrese placa valida de vehículo.";
+    }, 25);
     return;
   }
 
@@ -87,13 +99,26 @@ const store = async () => {
 
     onFormReset();
   } catch (error) {
-    proxy.$toast.fire({
-      icon: "error",
-      title: "Error",
-      text: "No se pudo registrar el vehículo",
-      background: "rgba(211, 47, 47, 0.85)", // rojo transparente
-      color: "#fff",
-    });
+    if (error.response && error.response.status === 422) {
+      // Cuando la placa ya existe
+      proxy.$toast.fire({
+        icon: "error",
+        title: "Error",
+        text: "❌ La placa ingresada ya existe, por favor verifique.",
+        background: "rgba(211, 47, 47, 0.85)", // rojo transparente
+        color: "#fff",
+      });
+      return;
+    } else {
+      proxy.$toast.fire({
+        icon: "error",
+        title: "Error",
+        text: "⚠️ Ocurrió un error inesperado.",
+        background: "rgba(211, 47, 47, 0.85)", // rojo transparente
+        color: "#fff",
+      });
+      return;
+    }
   } finally {
     isSaving.value = false;
     isLoading.value = false;
@@ -169,12 +194,19 @@ const dialogVisibleUpdate = (val) => {
               />
             </VCol>
             <VCol cols="6">
-              <VTextField
+              <!-- <VTextField
                 v-model="placa"
                 label="Placa"
                 placeholder="Example: PAA-0001"
+              /> -->
+              <VTextField
+                label="Placa"
+                v-model="placa"
+                @input="placa = formatPlate(placa)"
+                maxlength="8"
               />
             </VCol>
+
             <VCol cols="12">
               <VTextarea
                 v-model="observation"

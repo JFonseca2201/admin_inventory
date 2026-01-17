@@ -638,56 +638,34 @@ const store = async () => {
   }
 };
 
-const onlyDecimal = (e) => {
+/* const onlyDecimal = (e) => {
   const input = e.target;
-
-  // Cuando se borra, e.data es null → permitir
-  if (e.data === null) {
-    return;
-  }
-
   const char = e.data;
   const value = input.value ?? "";
 
-  // Bloquear letras y símbolos
+  // Borrar siempre permitido
+  if (char === null) return;
+
+  // Solo permitir números y el punto
   if (!/[0-9.]/.test(char)) {
     e.preventDefault();
     return;
   }
 
-  // Bloquear más de un punto
+  // Convertir "." inicial en "0."
+  if (value === "" && char === ".") {
+    input.value = "0.";
+    e.preventDefault();
+    return;
+  }
+
+  // Evitar dos puntos
   if (char === "." && value.includes(".")) {
     e.preventDefault();
     return;
   }
-
-  // Simular el valor final
-  const start = input.selectionStart ?? value.length;
-  const end = input.selectionEnd ?? value.length;
-
-  const next = value.slice(0, start) + char + value.slice(end);
-
-  // Máximo 6 caracteres
-  if (next.length > 6) {
-    e.preventDefault();
-    return;
-  }
-
-  // Máximo 2 decimales
-  if (next.includes(".")) {
-    const [, dec = ""] = next.split(".");
-    if (dec.length > 2) {
-      e.preventDefault();
-      return;
-    }
-  }
-
-  // No permitir valores <= 0 (solo si es número válido)
-  const num = parseFloat(next);
-  if (!isNaN(num) && num <= 0) {
-    e.preventDefault();
-  }
 };
+ */
 
 onMounted(() => {
   config();
@@ -846,7 +824,6 @@ definePage({ meta: { permission: "register_sale" } });
         </VRow>
       </VCardText>
     </VCard>
-    .
 
     <!-- 3. PRODUCTO -->
     <VCard class="mb-6">
@@ -1056,7 +1033,7 @@ definePage({ meta: { permission: "register_sale" } });
                   prefix="$"
                   v-model="amount"
                   placeholder="0.00"
-                  @beforeinput="onlyDecimal($event)"
+                  v-decimal
                 />
               </VCol>
               <VCol cols="4">
@@ -1150,7 +1127,6 @@ definePage({ meta: { permission: "register_sale" } });
       @clientSelected="selectedClient"
     >
     </ClientSearchDialog>
-
     <CarSearchDialog
       v-if="list_cars.length > 0 && isCarSearchDialogVisible"
       v-model:isDialogVisible="isCarSearchDialogVisible"
@@ -1158,19 +1134,16 @@ definePage({ meta: { permission: "register_sale" } });
       @carSelected="selectedCar"
     >
     </CarSearchDialog>
-
     <ClientFinalAddDialog
       v-model:isDialogVisible="isClientFinalAddDialogVisible"
       @addClient="addNewClient"
     >
     </ClientFinalAddDialog>
-
     <ClientCompanyAddDialog
       v-model:isDialogVisible="isClientCompanyAddDialogVisible"
       @addClient="addNewClient"
     >
     </ClientCompanyAddDialog>
-
     <CarAddDialog
       v-model:isDialogVisible="isCarAddDialogVisible"
       @addCar="addNewCar"
