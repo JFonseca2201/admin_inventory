@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
+/* =========================
+   HEADERS TABLA
+========================= */
 const headers = [
   { title: "ID", key: "id" },
   { title: "Marca", key: "brand" },
@@ -8,11 +11,14 @@ const headers = [
   { title: "Tipo de vehículo", key: "type_car" },
   { title: "Placa", key: "placa" },
   { title: "Estado", key: "state" },
-  { title: "Observación", key: "observation" },
+  { title: "Observación", key: "observation", width: "180" },
   { title: "Fecha de registro", key: "created_at" },
   { title: "Action", key: "action" },
 ];
 
+/* =========================
+   ESTADOS
+========================= */
 const isCarAddDialogVisible = ref(false);
 const isCarsEditDialogVisible = ref(false);
 const isCarDeleteDialogVisible = ref(false);
@@ -22,62 +28,83 @@ const searchQuery = ref(null);
 const car_selected_edit = ref(null);
 const car_selected_delete = ref(null);
 
-const isLoading = ref(false); // ⬅ loader global para la tabla
+const isLoading = ref(false);
 
+/* =========================
+   UTILIDADES
+========================= */
+const shortText = (text, limit = 20) => {
+  if (!text) return "Sin descripción.";
+  return text.length > limit ? text.slice(0, limit) + "..." : text;
+};
+
+/* =========================
+   API LISTADO
+========================= */
 const list = async () => {
   try {
-    isLoading.value = true; // mostrar overlay
+    isLoading.value = true;
+
     const resp = await $api(
       "cars?search=" + (searchQuery.value ? searchQuery.value : ""),
       {
         method: "GET",
         onResponseError({ response }) {
-          console.log(response._data.error);
+          console.log(response?._data?.error);
         },
       },
     );
-    list_cars.value = resp.cars;
+
+    list_cars.value = resp.cars ?? [];
   } catch (error) {
     console.log(error);
   } finally {
-    isLoading.value = false; // ocultar overlay
+    isLoading.value = false;
   }
 };
 
-const addNewCar = (NewCar) => {
-  let backup = [...list_cars.value];
-  backup.unshift(NewCar);
-  list_cars.value = backup;
+/* =========================
+   CRUD LOCAL
+========================= */
+const addNewCar = (newCar) => {
+  list_cars.value = [newCar, ...list_cars.value];
 };
 
 const addEditCar = (editCar) => {
-  let backup = [...list_cars.value];
-  const INDEX = backup.findIndex((rol) => rol.id == editCar.id);
-  if (INDEX !== -1) backup[INDEX] = editCar;
-  list_cars.value = backup;
+  const index = list_cars.value.findIndex((car) => car.id === editCar.id);
+  if (index !== -1) list_cars.value[index] = editCar;
 };
 
-const addDeleteCar = (Car) => {
-  let backup = [...list_cars.value];
-  const INDEX = backup.findIndex((rol) => rol.id == Car.id);
-  if (INDEX !== -1) backup.splice(INDEX, 1);
-  list_cars.value = backup;
+const addDeleteCar = (car) => {
+  list_cars.value = list_cars.value.filter((item) => item.id !== car.id);
 };
 
+/* =========================
+   ACCIONES
+========================= */
 const editItem = (item) => {
   car_selected_edit.value = item;
   isCarsEditDialogVisible.value = true;
 };
+
 const deleteItem = (item) => {
   car_selected_delete.value = item;
   isCarDeleteDialogVisible.value = true;
 };
 
+/* =========================
+   LIFECYCLE
+========================= */
 onMounted(() => {
   list();
 });
 
-definePage({ meta: { permission: "list_car" } });
+/* =========================
+   PERMISOS
+========================= */
+definePage({
+  meta: { permission: "list_car" },
+});
 </script>
 
 <template>
@@ -136,9 +163,11 @@ definePage({ meta: { permission: "list_car" } });
           <VChip color="primary" v-if="item.state == 1">Activo</VChip>
           <VChip color="error" v-if="item.state == 2">Inactivo</VChip>
         </template>
-        <template #item.observation="{ item }"
-          ><span class="text-h6">{{ item.observation }}</span></template
-        >
+        <template #item.observation="{ item }">
+          <span class="text-h6">
+            {{ shortText(item.observation) }}
+          </span>
+        </template>
         <template #item.action="{ item }">
           <div class="d-flex gap-1">
             <IconBtn size="small" @click="editItem(item)"

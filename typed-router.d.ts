@@ -32,6 +32,7 @@ declare module 'vue-router/auto-routes' {
     'kardex': RouteRecordInfo<'kardex', '/kardex', Record<never, never>, Record<never, never>>,
     'login': RouteRecordInfo<'login', '/login', Record<never, never>, Record<never, never>>,
     'not-authorized': RouteRecordInfo<'not-authorized', '/not-authorized', Record<never, never>, Record<never, never>>,
+    'offline-offline': RouteRecordInfo<'offline-offline', '/offline/offline', Record<never, never>, Record<never, never>>,
     'product-add': RouteRecordInfo<'product-add', '/product/add', Record<never, never>, Record<never, never>>,
     'product-edit-id': RouteRecordInfo<'product-edit-id', '/product/edit/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'product-list': RouteRecordInfo<'product-list', '/product/list', Record<never, never>, Record<never, never>>,

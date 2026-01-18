@@ -1,161 +1,162 @@
 <script setup>
-    const statisticsWithImages = ref([]);
-    const statisticsVertical = ref([]);
+const statisticsWithImages = ref([]);
+const statisticsVertical = ref([]);
 
-    definePage({
-        meta: {
-          permission: 'all'
-        },
-    })
+definePage({
+  meta: {
+    permission: "all",
+  },
+});
 
+// Función simple que elimina todo lo que no sea número
+const onlyNumbers = (value) => {
+  if (!value) return 0;
+  // Convertimos a número limpio
+  let num = Number(value.toString().replace(/[^0-9.]/g, ""));
+  if (isNaN(num)) return 0;
+  // Redondeamos a 2 decimales
+  return Math.round(num * 100) / 100;
+};
 
-    const iformation_general= async ()=>{
-      try {
-        
-        const resp = await $api("kpi/information_general", {
-            method: 'POST',
-            body: {},
-            onResponseError({ response }) {
-                console.log(response._data.error);
-            }
-        });
-        console.log(resp);
-        statisticsVertical.value = [
-          {
-            title: 'Total Sales',
-            color: 'primary',
-            icon: 'ri-shopping-cart-line',
-            stats: '$' + resp.totales_sales_month_current,
-            change: resp.variation_percentage_total_sales,
-            subtitle: 'Last 4 months',
-          },
-          {
-            title: resp.sucursales_most_sales_month_current ? resp.sucursales_most_sales_month_current.sucursale_most_sales: 'No hay sucusal',
-            color: 'success',
-            icon: 'ri-handbag-line',
-            stats: resp.sucursales_most_sales_month_current ? '$' + resp.sucursales_most_sales_month_current.total_sales: '0',
-            change: resp.variation_percentege_sucursale_most_sale,
-            subtitle: 'Last Six months',
-          },
-          {
-            title: 'Total Purchase',
-            color: 'secondary',
-            icon: 'ri-truck-line',
-            stats: '$' + resp.purchase_total_month_current,
-            change: resp.variation_percentage_purchase,
-            subtitle: 'Last Six months',
-          },
-        ]
-
-      } catch (error) {
-        console.log(error);
-        
-      }
-    }
-
-    const asesor_most_sales=async()=>{
-      const resp = await $api("kpi/asesor_most_sales", {
-            method: 'POST',
-            body: {},
-            onResponseError({ response }) {
-                console.log(response._data.error);
-            }
-        });
-        console.log(resp);
-        statisticsWithImages.value=[
-        {
-            title:  resp.asesores_m_most_sales_month_current ? resp.asesores_m_most_sales_month_current.asesor_full_name: 'No se encontraron coincidencias.',
-            subtitle:'Asesor Comercial',
-            stats: resp.asesores_m_most_sales_month_current ? '$'+resp.asesores_m_most_sales_month_current.total_sales: '$0.00',
-            change: resp.variation_percentage_asesor_m_most_sales,
-            image: 'https://cdn-icons-png.flaticon.com/512/3271/3271504.png',
-            imgWidth: 99,
-            color: 'primary',
-        },
-        {
-            title:  resp.asesores_f_most_sales_month_current ? resp.asesores_f_most_sales_month_current.asesor_full_name: 'No se encontraron coincidencias.',
-            subtitle:'Asesora comercial',
-            stats: resp.asesores_f_most_sales_month_current ? '$' +resp.asesores_f_most_sales_month_current.total_sales: '$0.00',
-            change: resp.variation_percentage_asesor_f_most_sales,
-            image: 'https://cdn-icons-png.flaticon.com/512/3271/3271502.png',
-            imgWidth: 85,
-            color: 'success',
-        },
+const iformation_general = async () => {
+  try {
+    const resp = await $api("kpi/information_general", {
+      method: "POST",
+      body: {},
+      onResponseError({ response }) {
+        console.log(response._data.error);
+      },
+    });
+    console.log(resp);
+    statisticsVertical.value = [
+      {
+        title: "Total Sales",
+        color: "primary",
+        icon: "ri-shopping-cart-line",
+        stats: "$" + onlyNumbers(resp.totales_sales_month_current),
+        change: onlyNumbers(resp.variation_percentage_total_sales),
+        subtitle: "Last 4 months",
+      },
+      {
+        title: resp.sucursales_most_sales_month_current
+          ? resp.sucursales_most_sales_month_current.sucursale_most_sales
+          : "No hay sucusal",
+        color: "success",
+        icon: "ri-handbag-line",
+        stats: resp.sucursales_most_sales_month_current
+          ? "$" +
+            onlyNumbers(resp.sucursales_most_sales_month_current.total_sales)
+          : "0",
+        change: onlyNumbers(resp.variation_percentege_sucursale_most_sale),
+        subtitle: "Last Six months",
+      },
+      {
+        title: "Total Purchase",
+        color: "secondary",
+        icon: "ri-truck-line",
+        stats: "$" + onlyNumbers(resp.purchase_total_month_current),
+        change: onlyNumbers(resp.variation_percentage_purchase),
+        subtitle: "Last Six months",
+      },
     ];
-    }
-  
-  onMounted(() => {
-    iformation_general();
-    asesor_most_sales();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const asesor_most_sales = async () => {
+  const resp = await $api("kpi/asesor_most_sales", {
+    method: "POST",
+    body: {},
+    onResponseError({ response }) {
+      console.log(response._data.error);
+    },
   });
+  console.log(resp);
+  statisticsWithImages.value = [
+    {
+      title: resp.asesores_m_most_sales_month_current
+        ? resp.asesores_m_most_sales_month_current.asesor_full_name
+        : "No se encontraron coincidencias.",
+      subtitle: "Asesor Comercial",
+      stats: resp.asesores_m_most_sales_month_current
+        ? "$" +
+          onlyNumbers(resp.asesores_m_most_sales_month_current.total_sales)
+        : "$0.00",
+      change: onlyNumbers(resp.variation_percentage_asesor_m_most_sales),
+      image: "https://cdn-icons-png.flaticon.com/512/3271/3271504.png",
+      imgWidth: 99,
+      color: "primary",
+    },
+    {
+      title: resp.asesores_f_most_sales_month_current
+        ? resp.asesores_f_most_sales_month_current.asesor_full_name
+        : "No se encontraron coincidencias.",
+      subtitle: "Asesora comercial",
+      stats: resp.asesores_f_most_sales_month_current
+        ? "$" +
+          onlyNumbers(resp.asesores_f_most_sales_month_current.total_sales)
+        : "$0.00",
+      change: onlyNumbers(resp.variation_percentage_asesor_f_most_sales),
+      image: "https://cdn-icons-png.flaticon.com/512/3271/3271502.png",
+      imgWidth: 85,
+      color: "success",
+    },
+  ];
+};
 
-  //definePage({ meta: { permission: 'dashboard', } });
+onMounted(() => {
+  iformation_general();
+  asesor_most_sales();
+});
 
+//definePage({ meta: { permission: 'dashboard', } });
 </script>
 <template>
-    <div>
-        <VRow class="match-height">
-            <VCol
-              v-for="statistics in statisticsVertical"
-              :key="statistics.title"
-              cols="12"
-              sm="6"
-              md="2"
-            >
-              <CardStatisticsVertical2 v-bind="statistics" />
-            </VCol>
+  <div>
+    <VRow class="match-height">
+      <VCol
+        v-for="statistics in statisticsVertical"
+        :key="statistics.title"
+        cols="12"
+        sm="6"
+        md="2"
+      >
+        <CardStatisticsVertical2 v-bind="statistics" />
+      </VCol>
 
-            <!-- 👉 Images Cards -->
-            <VCol
-                v-for="statistics in statisticsWithImages"
-                :key="statistics.title"
-                cols="12"
-                sm="6"
-                md="3"
-            >
-                <CardStatisticsWithImages2 v-bind="statistics" />
-            </VCol>
-            
-            
+      <!-- 👉 Images Cards -->
+      <VCol
+        v-for="statistics in statisticsWithImages"
+        :key="statistics.title"
+        cols="12"
+        sm="6"
+        md="3"
+      >
+        <CardStatisticsWithImages2 v-bind="statistics" />
+      </VCol>
 
-            <!-- 👉 Total Visits -->
-            <VCol
-                cols="12"
-                md="3"
-                sm="6"
-            >
-                <EcommerceTotalVisits />
-            </VCol>
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <EcommerceMarketingSales />
-            </VCol>
+      <!-- 👉 Total Visits -->
+      <VCol cols="12" md="3" sm="6">
+        <EcommerceTotalVisits />
+      </VCol>
+      <VCol cols="12" md="6">
+        <EcommerceMarketingSales />
+      </VCol>
 
-            <VCol
-                cols="12"
-                md="3"
-                sm="6"
-            >
-                <CrmCongratulationsNorris />
-            </VCol>
+      <VCol cols="12" md="3" sm="6">
+        <CrmCongratulationsNorris />
+      </VCol>
 
-            <!-- 👉 Weekly Sales -->
-            <VCol
-                cols="12"
-                md="6"
-            >
-                <AnalyticsWeeklySales />
-            </VCol>
+      <!-- 👉 Weekly Sales -->
+      <VCol cols="12" md="6">
+        <AnalyticsWeeklySales />
+      </VCol>
 
-            <!-- 👉 Top Referral Sources -->
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <EcommerceTopReferralSources />
-            </VCol>            
-        </VRow>
-    </div>
+      <!-- 👉 Top Referral Sources -->
+      <VCol cols="12" md="6">
+        <EcommerceTopReferralSources />
+      </VCol>
+    </VRow>
+  </div>
 </template>

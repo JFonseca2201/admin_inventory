@@ -252,7 +252,7 @@ declare global {
   const useMousePressed: typeof import('@vueuse/core')['useMousePressed']
   const useMutationObserver: typeof import('@vueuse/core')['useMutationObserver']
   const useNavigatorLanguage: typeof import('@vueuse/core')['useNavigatorLanguage']
-  const useNetwork: typeof import('@vueuse/core')['useNetwork']
+  const useNetwork: typeof import('./src/composables/useNetwork.js')['useNetwork']
   const useNow: typeof import('@vueuse/core')['useNow']
   const useObjectUrl: typeof import('@vueuse/core')['useObjectUrl']
   const useOffsetPagination: typeof import('@vueuse/core')['useOffsetPagination']
@@ -605,7 +605,7 @@ declare module 'vue' {
     readonly useMousePressed: UnwrapRef<typeof import('@vueuse/core')['useMousePressed']>
     readonly useMutationObserver: UnwrapRef<typeof import('@vueuse/core')['useMutationObserver']>
     readonly useNavigatorLanguage: UnwrapRef<typeof import('@vueuse/core')['useNavigatorLanguage']>
-    readonly useNetwork: UnwrapRef<typeof import('@vueuse/core')['useNetwork']>
+    readonly useNetwork: UnwrapRef<typeof import('./src/composables/useNetwork.js')['useNetwork']>
     readonly useNow: UnwrapRef<typeof import('@vueuse/core')['useNow']>
     readonly useObjectUrl: UnwrapRef<typeof import('@vueuse/core')['useObjectUrl']>
     readonly useOffsetPagination: UnwrapRef<typeof import('@vueuse/core')['useOffsetPagination']>
@@ -951,7 +951,7 @@ declare module '@vue/runtime-core' {
     readonly useMousePressed: UnwrapRef<typeof import('@vueuse/core')['useMousePressed']>
     readonly useMutationObserver: UnwrapRef<typeof import('@vueuse/core')['useMutationObserver']>
     readonly useNavigatorLanguage: UnwrapRef<typeof import('@vueuse/core')['useNavigatorLanguage']>
-    readonly useNetwork: UnwrapRef<typeof import('@vueuse/core')['useNetwork']>
+    readonly useNetwork: UnwrapRef<typeof import('./src/composables/useNetwork.js')['useNetwork']>
     readonly useNow: UnwrapRef<typeof import('@vueuse/core')['useNow']>
     readonly useObjectUrl: UnwrapRef<typeof import('@vueuse/core')['useObjectUrl']>
     readonly useOffsetPagination: UnwrapRef<typeof import('@vueuse/core')['useOffsetPagination']>

@@ -1,56 +1,63 @@
-import { setupLayouts } from 'virtual:generated-layouts'
-import { createRouter, createWebHistory } from 'vue-router/auto'
-import { setupGuards } from './guards';
+import { setupLayouts } from "virtual:generated-layouts";
+import { createRouter, createWebHistory } from "vue-router/auto";
+import { setupGuards } from "./guards";
+import OfflinePage from "@/pages/offline/offline.vue";
 
 function recursiveLayouts(route) {
   if (route.children) {
     for (let i = 0; i < route.children.length; i++)
-      route.children[i] = recursiveLayouts(route.children[i])
+      route.children[i] = recursiveLayouts(route.children[i]);
 
-    return route
+    return route;
   }
 
-  return setupLayouts([route])[0]
+  return setupLayouts([route])[0];
 }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to) {
-    if (to.hash)
-      return { el: to.hash, behavior: 'smooth', top: 60 }
+    if (to.hash) return { el: to.hash, behavior: "smooth", top: 60 };
 
-    return { top: 0 }
+    return { top: 0 };
   },
-  extendRoutes: pages => [
+  extendRoutes: (pages) => [
     ...[
       {
-        path: '/',
-        name: 'index',
-        redirect: to => {
+        path: "/",
+        name: "index",
+        redirect: (to) => {
           // TODO: Get type from backend
-          const userData = localStorage.getItem("user");//useCookie('userData')
+          const userData = localStorage.getItem("user"); //useCookie('userData')
           console.log(userData);
-          if (userData)
-            return { name: 'dashboard' }
+          if (userData) return { name: "dashboard" };
 
-          return { name: 'login', query: to.query }
+          return { name: "login", query: to.query };
         },
       },
     ],
-    ...[...pages, ...[
-      {
-        path: '/roles-y-permisos',
-        name: 'roles-permisos',
-        component: () => import('@/pages/roles-permisos/index.vue'),
-        meta: {
-          permission: 'list_role',
-        }
-      }
-    ]].map(route => recursiveLayouts(route)),
+    ...[
+      ...pages,
+      ...[
+        {
+          path: "/roles-y-permisos",
+          name: "roles-permisos",
+          component: () => import("@/pages/roles-permisos/index.vue"),
+          meta: {
+            permission: "list_role",
+          },
+        },
+        {
+          path: "/offline",
+          name: "offline",
+          component: OfflinePage, // <- importación estática
+        },
+      ],
+    ].map((route) => recursiveLayouts(route)),
   ],
-})
-setupGuards(router)
-export { router }
+});
+setupGuards(router);
+export { router };
 export default function (app) {
-  app.use(router)
+  app.use(router);
 }
