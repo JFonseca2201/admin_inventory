@@ -288,19 +288,27 @@ definePage({ meta: { permission: "kardex" } });
           </VCol>
         </VRow>
       </VCardText>
-      <VCardText class="">
+      <VCardText class="kardex">
         <template
           v-for="(kardex_product, index) in kardex_products"
           :key="index"
         >
           <VRow>
-            <VCol cols="12">
-              Producto: {{ kardex_product.title }}
-              <br />
-              Sku: {{ kardex_product.sku }}
-              <br />
-              Categoria: {{ kardex_product.categoria }}
-              <hr />
+            <VCol cols="6">
+              <table class="kardex no-border">
+                <tr>
+                  <td>Producto</td>
+                  <td class="product-name">{{ kardex_product.title }}</td>
+                </tr>
+                <tr>
+                  <td>Código/Sku:</td>
+                  <td>{{ kardex_product.sku }}</td>
+                </tr>
+                <tr>
+                  <td>Categoria:</td>
+                  <td>{{ kardex_product.categoria }}</td>
+                </tr>
+              </table>
             </VCol>
             <VCol cols="12">
               <table>
@@ -507,13 +515,13 @@ definePage({ meta: { permission: "kardex" } });
 </template>
 
 <style>
-table {
+.kardex table {
   width: 100%;
   border-collapse: collapse;
 }
 
-th,
-td {
+.kardex th,
+.kardex td {
   border: 1px solid black;
   text-align: center;
   padding: 5px;
@@ -536,6 +544,16 @@ th {
 }
 
 .existencias {
-  background-color: #fff3cd;
+  background-color: #cdf1ff;
+}
+.kardex.no-border th,
+.kardex.no-border td {
+  border: none !important;
+  text-align: left;
+}
+
+.kardex .product-name {
+  font-size: 18px; /* más grande */
+  font-weight: bold; /* negrilla */
 }
 </style>
