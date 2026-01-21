@@ -355,8 +355,15 @@ definePage({ meta: { permission: "kardex" } });
                         <td>{{ movimient.detalle }}</td>
                         <template v-if="movimient.entrada">
                           <td>{{ movimient.entrada.quantity }}</td>
-                          <td>$ {{ movimient.entrada.price_unit }}</td>
-                          <td>$ {{ movimient.entrada.total }}</td>
+                          <td>
+                            $
+                            {{
+                              Number(movimient.entrada.price_unit).toFixed(2)
+                            }}
+                          </td>
+                          <td>
+                            $ {{ Number(movimient.entrada.total).toFixed(2) }}
+                          </td>
                         </template>
                         <template v-if="!movimient.entrada">
                           <td></td>
@@ -366,8 +373,13 @@ definePage({ meta: { permission: "kardex" } });
 
                         <template v-if="movimient.salida">
                           <td>{{ movimient.salida.quantity }}</td>
-                          <td>$ {{ movimient.salida.price_unit }}</td>
-                          <td>$ {{ movimient.salida.total }}</td>
+                          <td>
+                            $
+                            {{ Number(movimient.salida.price_unit).toFixed(2) }}
+                          </td>
+                          <td>
+                            $ {{ Number(movimient.salida.total).toFixed(2) }}
+                          </td>
                         </template>
                         <template v-if="!movimient.salida">
                           <td></td>
@@ -376,8 +388,15 @@ definePage({ meta: { permission: "kardex" } });
                         </template>
 
                         <td>{{ movimient.existencia.quantity }}</td>
-                        <td>$ {{ movimient.existencia.price_unit }}</td>
-                        <td>$ {{ movimient.existencia.total }}</td>
+                        <td>
+                          $
+                          {{
+                            Number(movimient.existencia.price_unit).toFixed(2)
+                          }}
+                        </td>
+                        <td>
+                          $ {{ Number(movimient.existencia.total).toFixed(2) }}
+                        </td>
                       </tr>
                     </template>
                   </template>
@@ -432,8 +451,15 @@ definePage({ meta: { permission: "kardex" } });
 
                         <template v-if="movimient.entrada">
                           <td>{{ movimient.entrada.quantity }}</td>
-                          <td>$ {{ movimient.entrada.price_unit }}</td>
-                          <td>$ {{ movimient.entrada.total }}</td>
+                          <td>
+                            $
+                            {{
+                              Number(movimient.entrada.price_unit).toFixed(2)
+                            }}
+                          </td>
+                          <td>
+                            $ {{ Number(movimient.entrada.total).toFixed(2) }}
+                          </td>
                         </template>
                         <template v-if="!movimient.entrada">
                           <td></td>
@@ -443,8 +469,13 @@ definePage({ meta: { permission: "kardex" } });
 
                         <template v-if="movimient.salida">
                           <td>{{ movimient.salida.quantity }}</td>
-                          <td>$ {{ movimient.salida.price_unit }}</td>
-                          <td>$ {{ movimient.salida.total }}</td>
+                          <td>
+                            $
+                            {{ Number(movimient.salida.price_unit).toFixed(2) }}
+                          </td>
+                          <td>
+                            $ {{ Number(movimient.salida.total).toFixed(2) }}
+                          </td>
                         </template>
                         <template v-if="!movimient.salida">
                           <td></td>
@@ -453,8 +484,15 @@ definePage({ meta: { permission: "kardex" } });
                         </template>
 
                         <td>{{ movimient.existencia.quantity }}</td>
-                        <td>$ {{ movimient.existencia.price_unit }}</td>
-                        <td>$ {{ movimient.existencia.total }}</td>
+                        <td>
+                          $
+                          {{
+                            Number(movimient.existencia.price_unit).toFixed(2)
+                          }}
+                        </td>
+                        <td>
+                          $ {{ Number(movimient.existencia.total).toFixed(2) }}
+                        </td>
                       </tr>
                     </template>
                   </template>
