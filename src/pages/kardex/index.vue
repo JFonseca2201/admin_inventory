@@ -173,11 +173,10 @@ const kardex = async () => {
 };
 
 const reset = () => {
-  isLoading.value = true;
   warehouse_id.value = null;
   select_product.value = null;
   search_product.vlaue = null;
-  isLoading.value = false;
+  kardex();
 };
 
 const getNameUnit = (movimient_for_unit, units) => {
@@ -288,14 +287,14 @@ definePage({ meta: { permission: "kardex" } });
           </VCol>
         </VRow>
       </VCardText>
-      <VCardText class="kardex">
+      <VCardText class="kardex product-name">
         <template
           v-for="(kardex_product, index) in kardex_products"
           :key="index"
         >
           <VRow>
             <VCol cols="6">
-              <table class="kardex no-border">
+              <table class="kardex no-border product-name">
                 <tr>
                   <td>Producto</td>
                   <td class="product-name">{{ kardex_product.title }}</td>
@@ -310,11 +309,29 @@ definePage({ meta: { permission: "kardex" } });
                 </tr>
               </table>
             </VCol>
+            <hr />
             <VCol cols="12">
-              <table>
+              <table class="product-name">
                 <thead>
                   <tr>
-                    <th rowspan="1" colspan="2"></th>
+                    <th rowspan="1" colspan="2">
+                      <!-- <table class="kardex no-border">
+                        <tr>
+                          <td>Producto</td>
+                          <td class="product-name">
+                            {{ kardex_product.title }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Código/Sku:</td>
+                          <td>{{ kardex_product.sku }}</td>
+                        </tr>
+                        <tr>
+                          <td>Categoria:</td>
+                          <td>{{ kardex_product.categoria }}</td>
+                        </tr>
+                      </table> -->
+                    </th>
                     <th colspan="3" class="entrada">Entrada</th>
                     <th colspan="3" class="salida">Salida</th>
                     <th colspan="3" class="existencias">Existencias</th>
@@ -544,7 +561,7 @@ th {
 }
 
 .existencias {
-  background-color: #cdf1ff;
+  background-color: #fffcd3;
 }
 .kardex.no-border th,
 .kardex.no-border td {
@@ -553,7 +570,7 @@ th {
 }
 
 .kardex .product-name {
-  font-size: 18px; /* más grande */
-  font-weight: bold; /* negrilla */
+  text-transform: uppercase;
+  font-family: "Courier New", Courier, monospace;
 }
 </style>
