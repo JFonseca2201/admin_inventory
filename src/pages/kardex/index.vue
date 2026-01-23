@@ -54,7 +54,6 @@ const month_list = ref([
 ]);
 const isLoading = ref(false);
 const year_list = ref([
-  "2023",
   "2024",
   "2025",
   "2026",
@@ -188,9 +187,24 @@ const getNameUnit = (movimient_for_unit, units) => {
 
 onMounted(() => {
   kardex();
-
   config();
 });
+
+const downloadPDF = () => {
+  isLoading.value = true;
+  const query = new URLSearchParams({
+    year: year_selected.value,
+    month: month_selected.value,
+    warehouse_id: warehouse_id.value ?? "",
+    product_id: select_product.value ? select_product.value.id : (null ?? ""),
+  }).toString();
+
+  window.open(
+    import.meta.env.VITE_API_BASE_URL + "kardex-pdf?" + query,
+    "_blank",
+  );
+  isLoading.value = false;
+};
 
 definePage({ meta: { permission: "kardex" } });
 </script>
@@ -282,6 +296,18 @@ definePage({ meta: { permission: "kardex" } });
                     >Refrescar</VTooltip
                   >
                 </VBtn>
+                <!-- <VCol cols="12" class="d-flex justify-end"> -->
+                <VBtn
+                  color="error"
+                  class="mx-1"
+                  prepend-icon="ri-file-pdf-line"
+                  @click="downloadPDF()"
+                >
+                  <VTooltip activator="parent" location="top"
+                    >Descargar PDF</VTooltip
+                  >
+                </VBtn>
+                <!-- </VCol> -->
               </VCol>
             </VRow>
           </VCol>
@@ -314,24 +340,7 @@ definePage({ meta: { permission: "kardex" } });
               <table class="product-name">
                 <thead>
                   <tr>
-                    <th rowspan="1" colspan="2">
-                      <!-- <table class="kardex no-border">
-                        <tr>
-                          <td>Producto</td>
-                          <td class="product-name">
-                            {{ kardex_product.title }}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Código/Sku:</td>
-                          <td>{{ kardex_product.sku }}</td>
-                        </tr>
-                        <tr>
-                          <td>Categoria:</td>
-                          <td>{{ kardex_product.categoria }}</td>
-                        </tr>
-                      </table> -->
-                    </th>
+                    <th rowspan="1" colspan="2"></th>
                     <th colspan="3" class="entrada">Entrada</th>
                     <th colspan="3" class="salida">Salida</th>
                     <th colspan="3" class="existencias">Existencias</th>
